@@ -21,7 +21,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'website_sale'],
+    'depends': ['base'],
 
     # always loaded
     'data': [
