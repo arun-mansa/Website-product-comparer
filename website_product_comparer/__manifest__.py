@@ -22,12 +22,8 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'website_sale'],
-
-    # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
         'views/templates.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': []
+    'installable': True,
 }
