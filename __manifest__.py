@@ -15,6 +15,8 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
     # for the full list
+    'price': 25, 
+    'currency': 'EUR',
     'category': 'Website',
     'version': '0.1',
 
