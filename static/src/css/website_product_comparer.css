@@ -1,0 +1,42 @@
+.clearfix {
+	clear: both;
+}
+
+.oe_product .product_compare_checkbox {
+    position: absolute;
+    right: 5px;
+}
+
+#fixed_compare_button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px; 
+}
+
+.product_compare_widget {
+	position: fixed;
+    bottom: 80px;
+    right: 20px; 
+    z-index: 6;
+}
+
+.compared_item_line {
+  border-bottom: 1px #EEE solid;
+  margin-bottom: 10px;
+}
+
+.compared_item {
+	padding-bottom: 10px;
+	min-width: 75px;
+	min-height: 75px;
+}
+
+.loading {
+    margin: 20px auto;
+    width: 400px;
+    font-size: 50px;
+}
+
+.link-text {
+    color: #083d8d;
+}

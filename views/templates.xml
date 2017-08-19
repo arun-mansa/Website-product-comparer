@@ -1,0 +1,152 @@
+<odoo>
+  <data>
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Product comparer">
+      <xpath expr="." position="inside">
+        <link rel="stylesheet" href="/website_product_comparer/static/src/css/website_product_comparer.css" />
+        <link rel="stylesheet" href="/website_product_comparer/static/src/css/reset.css" />
+        <link rel="stylesheet" href="/website_product_comparer/static/src/css/style.css" />
+
+        <script type="text/javascript" src="/website_product_comparer/static/src/js/website_product_comparer.js"></script>
+        <script type="text/javascript" src="/website_product_comparer/static/src/js/website_product_comparer_comparison_table.js"></script>
+      </xpath>
+    </template>
+
+    <template id="compare_check_box" inherit_id="website_sale.products_item" name="Comapre checkbox">
+      <xpath expr="//div[@itemprop='offers']" position="after">
+        <div class="product_compare_checkbox">
+          <label t-att-for="'product-' + str(product.id)">
+            <input t-att-id="'product-' + str(product.id)" class="compare_checkbox" name="marked_to_compare" type="checkbox" t-att-value="product.id"/>
+            <span class="link-text">Compare</span>
+          </label>
+        </div>
+        <div class="clearfix"></div>
+      </xpath>
+    </template>
+
+    <template id="product_image_view" name="Product image view">
+      <div class="compared-item row compared_item_line">
+        <div class="col-md-12 compared_item">
+          <button type="button" class="close remove_product" data-dismiss="alert" t-att-data-product-id="product.id"><span aria-hidden="true" class="fa fa-times"></span><span class="sr-only">Close</span></button>
+          <div itemprop="image" t-field="product.image" t-options="{'widget': 'image', 'resize': None if product_image_big else '75x75', 'zoom': 'image'}" t-att-alt="product.name" />
+          <div class="text-center">
+            <a itemprop="url" t-att-href="'/shop/product/%s' % (slug(product))" t-field="product.name" />
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="compare_widget" inherit_id="website_sale.products" name="Fixed compare button">
+      <xpath expr="//div[@class='js_sale']" position="after">
+        <div class="product_compare_widget" style="display: none">
+          <div class="compared-products-list" style="display:none">
+          </div>
+          <a href="/comparer/compare_product" id="fixed_compare_button" class="btn btn-primary btn-lg">Compare <span id="prod_count" class="badge">0</span></a>
+        </div>
+        <div class="clearfix"></div>
+      </xpath>
+    </template>
+
+    <template id="product_comparison_view_holder" name="Product comparison view holder">
+      <t t-call="website.layout">
+        <t t-set="additional_title">Product Comparison</t>
+        <div id="wrap" class="js_sale">
+          <div class="container compare-table-container">
+            <div class="loading">Loading...</div>
+          </div>
+        </div>
+      </t>
+    </template>
+
+    <template id="product_comparison_view" name="Product comparison view">
+      <div class="comparison-table">
+        <section class="cd-products-comparison-table">
+          <!-- <header class="clearfix">
+            <div class="actions">
+              <a href="#0" class="reset">Reset</a>
+              <a href="#0" class="filter">Filter</a>
+            </div>
+          </header> -->
+
+          <div class="cd-products-table">
+            <div class="features">
+              <div class="top-info">Models</div>
+              <ul class="cd-features-list">
+                <li>Price</li>
+                <li>Default code</li>
+                <t t-foreach="attr" t-as="attribute_id">
+                  <li><span t-esc="attr[attribute_id]"/></li>
+                </t>
+                <li class="description">Description</li>
+              </ul>
+            </div>
+
+            <div class="cd-products-wrapper">
+              <ul class="cd-products-columns">
+                <t t-foreach="products" t-as="product_v">
+                  <t t-foreach="product_v.product_variant_ids" t-as="product">
+                    <li class="product">
+                      <div class="top-info clearfix">
+                        <button type="button" class="close remove_product" data-dismiss="alert" t-att-data-product-id="product.id"><span aria-hidden="true" class="fa fa-times"></span><span class="sr-only">Close</span></button>
+                        <!-- <div class="check"></div> -->
+                        <div itemprop="image" t-field="product.image" t-options="{'widget': 'image', 'resize': None if product_image_big else '150x150'}" t-att-alt="product.name" />
+
+                        <div class="top_info_field">
+                          <a itemprop="url" t-att-href="'/shop/product/%s' % (slug(product))">
+                            <h3 t-field="product.name" />
+                          </a>
+                        </div>
+                        <div class="top_info_field">
+                          <form action="/shop/cart/update" class="js_add_cart_variants" method="POST">
+                            <input name="product_id" t-att-value="product.id" type="hidden"/>
+                            <button id="add_to_cart" type="submit" class="btn btn-primary fa fa-shopping-cart a-submit"> Add to cart</button>
+                          </form>
+                        </div>
+                      </div>
+
+                      <ul class="cd-features-list">
+                        <li>
+                          <div itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer" class="product_price" t-if="product.product_variant_ids">
+                            <b>
+                              <t t-if="(compute_currency(product.lst_price) - product.website_price ) &gt; 0.01  and website.get_current_pricelist().discount_policy=='without_discount'">
+                                <del class="text-danger mr8" style="white-space: nowrap;" t-esc="compute_currency(product.website_public_price)" t-options="{'widget': 'monetary', 'display_currency': website.get_current_pricelist().currency_id, 'from_currency': website.currency_id}" />
+                              </t>
+
+                              <span t-esc="product.website_price" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                              <span itemprop="price" style="display:none;" t-esc="product.website_price" />
+                              <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name" />
+                            </b>
+                          </div>
+                        </li>
+                        <li><span t-field="product.default_code" /></li>
+                        <t t-foreach="attr" t-as="attribute_id">
+                          <li>
+                            <span t-esc="get_value(product.id, attribute_id, value)"></span>
+                          </li>
+                        </t>
+                        <li class="description">
+                          <div t-field="product.description_sale"></div>
+                        </li>
+                      </ul>
+                    </li>
+                  </t>
+                </t> 
+              </ul> 
+            </div>
+
+            <ul class="cd-table-navigation">
+              <li><a href="#0" class="prev inactive">Prev</a></li>
+              <li><a href="#0" class="next">Next</a></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="no-products" style="display:none">
+          <div>
+            Please choose products to compare
+          </div>
+        </section>
+      </div>
+    </template>
+
+  </data>
+</odoo>
